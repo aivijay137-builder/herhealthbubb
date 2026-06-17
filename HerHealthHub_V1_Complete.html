@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Humm · Her Health Hub — PCOS Care Plan V1</title>
+</head>
+<body>
+<div id="root"></div>
+<noscript style="display:block;padding:24px;font-family:sans-serif">JavaScript must be enabled.</noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js" crossorigin></script>
+<script type="text/babel" data-presets="react">
+const CSS_STYLES = `@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#E9EDE8}
+#root{min-height:100vh}
+
+/* ── TOKENS ── */
+:root{
+  --bg:#E9EDE8; --surface:#FFFFFF; --surface2:#F3F6F1; --surface3:#EDF1EC;
+  --ink:#14302B; --ink2:#445E56; --ink3:#728880; --ink4:#A3B8B0;
+  --teal:#1B6B5F; --teal-d:#114840; --teal-soft:#DFF0EB; --teal-mid:#A8D4CC;
+  --clay:#B85E35; --clay-soft:#F5E3D8; --clay-mid:#D9956A;
+  --rose:#A03228; --rose-soft:#F2DDD9;
+  --amber:#8F6610; --amber-soft:#F2E6C8;
+  --line:#D8E2DE; --line2:#E8EEEB;
+  --cool:#EDF0F4; --cool-line:#D4DBE2;
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:28px;
+  --shadow-sm:0 2px 8px -4px rgba(20,48,43,.18);
+  --shadow-md:0 8px 24px -12px rgba(20,48,43,.28);
+  --shadow-lg:0 20px 48px -20px rgba(20,48,43,.38);
+}
+
+/* ── APP SHELL ── */
+.app{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;padding-bottom:48px;-webkit-font-smoothing:antialiased}
+.app button:focus-visible,.app textarea:focus-visible,.app input:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:var(--r-sm)}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.topbar-brand{display:flex;flex-direction:column;margin-right:auto;line-height:1.15}
+.brand-logo{font-family:'Instrument Serif',Georgia,serif;font-size:22px;color:var(--teal-d);letter-spacing:-.01em}
+.brand-sub{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase;margin-top:1px}
+/* 3-way role toggle */
+.roletoggle{position:relative;display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px}
+.role-slider{position:absolute;top:3px;bottom:3px;left:3px;width:calc(33.333% - 2px);background:var(--teal);border-radius:999px;box-shadow:0 2px 6px rgba(17,72,64,.3);transition:transform .35s cubic-bezier(.34,1.45,.5,1)}
+.roletoggle.role-clinician .role-slider{transform:translateX(100%)}
+.roletoggle.role-coordinator .role-slider{transform:translateX(200%)}
+.rolebtn{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;background:transparent;color:var(--ink2);font:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;transition:color .25s;white-space:nowrap}
+.rolebtn.on{color:#fff}
+.rolebtn.on svg{animation:hh-settle .38s ease}
+.rolebtn:not(.on):hover{color:var(--teal-d)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.notif-dot{background:var(--rose);color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:99px;display:flex;align-items:center;justify-content:center}
+.reset-btn{display:flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);font:inherit;font-size:12px;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;transition:border-color .15s,color .15s}
+.reset-btn:hover{border-color:var(--ink3);color:var(--ink)}
+.reset-btn:hover svg{animation:hh-spin .55s ease}
+
+/* ── RIBBON ── */
+.ribbon{background:var(--amber-soft);color:#6b4d0c;font-size:11px;font-weight:500;text-align:center;padding:6px 18px;border-bottom:1px solid #dbc990}
+
+/* ── HINT BAR ── */
+.hintbar{max-width:980px;margin:16px auto 0;display:flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal-d);font-size:13px;font-weight:500;padding:10px 14px;border-radius:11px;border:1px solid var(--teal-mid)}
+
+/* ── STAGE ── */
+.stage{max-width:980px;margin:0 auto;padding:24px 18px 0;display:flex;align-items:flex-start;gap:20px;justify-content:center}
+
+/* ── PHONE ── */
+.phone-wrap{display:flex;gap:18px;align-items:flex-start}
+.phone{width:390px;flex-shrink:0;background:#0C2721;border-radius:48px;padding:12px;box-shadow:var(--shadow-lg),0 0 0 1px rgba(255,255,255,.06)}
+.phone-notch{display:flex;align-items:center;justify-content:center;padding:4px 0 8px}
+.phone-cam{width:12px;height:12px;border-radius:99px;background:#1a3830}
+.phone-screen{background:var(--surface);border-radius:38px;overflow:hidden;min-height:680px}
+.phone-home{width:120px;height:5px;background:#1a3830;border-radius:99px;margin:10px auto 4px}
+
+/* ── SCREENS ── */
+.screen{padding:26px 22px 28px;animation:hh-fade .32s ease}
+.screen-welcome{display:flex;flex-direction:column;min-height:680px}
+.screen-center{display:flex;flex-direction:column;align-items:center;padding-top:60px;min-height:680px}
+.screen-plan{padding-bottom:20px}
+.screen-progress{min-height:500px}
+.mt-auto{margin-top:auto}
+.mt-8{margin-top:8px}
+.tc{text-align:center}
+
+/* ── TYPOGRAPHY ── */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:4px}
+.h-display{font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.15;letter-spacing:-.01em;color:var(--ink);margin-bottom:12px}
+.h-display em{font-style:italic;color:var(--teal)}
+.h-screen{font-family:'Instrument Serif',Georgia,serif;font-size:22px;line-height:1.2;color:var(--ink);margin-bottom:6px}
+.h-plan{font-family:'Instrument Serif',Georgia,serif;font-size:20px;line-height:1.2;color:var(--ink)}
+.body-lead{font-size:14px;line-height:1.55;color:var(--ink2);margin-bottom:20px}
+.muted{font-size:13px;color:var(--ink3);line-height:1.45;margin-bottom:12px}
+.tiny{font-size:11.5px;margin-top:16px}
+.screen-sub{font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.4}
+
+/* ── WELCOME LEAF ── */
+.welcome-leaf{position:absolute;right:-10px;top:-10px;width:110px;opacity:.6;pointer-events:none}
+.screen-welcome{position:relative;overflow:hidden}
+
+/* ── TRUST LIST ── */
+.trust-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.trust-list li{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;color:var(--ink);animation:hh-rise .5s ease backwards}
+.trust-list li:nth-child(1){animation-delay:.06s}
+.trust-list li:nth-child(2){animation-delay:.14s}
+.trust-list li:nth-child(3){animation-delay:.22s}
+.trust-list svg{color:var(--teal);flex-shrink:0}
+
+/* ── CONSENT NOTE ── */
+.consent-note{font-size:11px;color:var(--ink4);line-height:1.45;background:var(--surface2);border-radius:9px;padding:9px 11px;margin-bottom:14px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:12px;font:inherit;font-weight:600;font-size:14px;padding:13px 18px;cursor:pointer;transition:transform .1s,background .15s,box-shadow .15s}
+.btn:active{transform:translateY(1px)!important}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-d);transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(17,72,64,.5)}
+.btn-primary:disabled{background:#a8bfba;cursor:not-allowed;transform:none!important;box-shadow:none}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink3);transform:translateY(-1px)}
+.btn-rose{background:var(--rose);color:#fff;font-size:12.5px;padding:9px 14px;border-radius:9px}
+.btn-rose:hover{background:#7d251d;transform:translateY(-1px)}
+.btn-sm{font-size:13px;padding:9px 14px}
+.btn-block{width:100%}
+.btn-arrow{transition:transform .18s}
+.btn-primary:hover .btn-arrow{transform:translateX(3px)}
+
+/* ── STEP DOTS ── */
+.step-dots{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.step-dot-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.step-dot{width:8px;height:8px;border-radius:99px;background:var(--line);transition:background .25s,transform .25s;display:block}
+.step-dot-wrap.on .step-dot{background:var(--teal);transform:scale(1.3)}
+.step-dot-wrap.done .step-dot{background:var(--teal-soft)}
+.step-label{font-size:10px;font-weight:600;color:var(--ink4);letter-spacing:.04em;text-transform:uppercase;transition:color .25s}
+.step-dot-wrap.on .step-label{color:var(--teal)}
+.step-dot-wrap.done .step-label{color:var(--teal-mid)}
+
+/* ── SYMPTOM CARDS ── */
+.sym-list{display:flex;flex-direction:column;gap:9px;margin-bottom:8px}
+.sym-card{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface);transition:border-color .2s,background .2s,box-shadow .2s}
+.sym-card.on{border-color:var(--teal);background:var(--teal-soft);box-shadow:0 4px 14px -10px rgba(27,107,95,.45)}
+.sym-head{width:100%;display:flex;align-items:center;gap:10px;background:transparent;border:none;font:inherit;padding:12px 13px;cursor:pointer;text-align:left}
+.sym-icon{width:28px;height:28px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--teal);flex-shrink:0;transition:background .2s,transform .2s}
+.sym-card.on .sym-icon{background:#fff;transform:scale(1.06)}
+.sym-label{flex:1;font-size:13.5px;font-weight:600}
+.sym-check{width:20px;height:20px;border-radius:99px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .2s,border-color .2s}
+.sym-check.on{background:var(--teal);border-color:var(--teal)}
+.sym-check.on svg{animation:hh-pop .3s cubic-bezier(.34,1.56,.64,1)}
+.sev-row{display:flex;gap:5px;padding:0 13px 11px}
+.seg-row{display:flex;gap:5px}
+.sev-btn{flex:1;border:1px solid var(--line);background:#fff;color:var(--ink2);font:inherit;font-size:12px;font-weight:600;padding:8px 5px;border-radius:9px;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .1s;white-space:nowrap}
+.sev-btn:hover{border-color:var(--teal)}
+.sev-btn.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.sev-btn:active{transform:scale(.95)}
+
+/* ── GOALS ── */
+.goals-list{display:flex;flex-direction:column;gap:9px}
+.goal-card{display:flex;align-items:center;gap:11px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:13px;font:inherit;cursor:pointer;text-align:left;transition:transform .15s,border-color .2s,background .2s,box-shadow .2s}
+.goal-card:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:var(--shadow-sm)}
+.goal-card.on{border-color:var(--teal);background:var(--teal-soft)}
+.goal-dot{width:9px;height:9px;border-radius:99px;background:var(--line);flex-shrink:0;transition:background .2s,transform .2s}
+.goal-card.on .goal-dot{background:var(--teal);transform:scale(1.35)}
+.goal-text{flex:1;display:flex;flex-direction:column;gap:2px}
+.goal-label{font-size:13.5px;font-weight:600;color:var(--ink)}
+.goal-desc{font-size:11.5px;color:var(--ink3)}
+.goal-check{color:var(--teal);animation:hh-pop .3s cubic-bezier(.34,1.56,.64,1)}
+
+/* ── FIELDS ── */
+.field{margin-bottom:16px}
+.field-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:7px}
+.chip-wrap{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink2);font:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:99px;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .1s}
+.chip:hover{border-color:var(--teal)}
+.chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.chip:active{transform:scale(.95)}
+.textarea{width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;font:inherit;font-size:13px;color:var(--ink);resize:none;background:var(--surface2);transition:border-color .15s}
+.textarea:focus{border-color:var(--teal);outline:none}
+
+/* ── INTAKE NAV ── */
+.intake-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}
+.intake-nav .btn-primary{margin-left:auto}
+
+/* ── REVIEW CARD ── */
+.review-card{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;margin-bottom:14px}
+.review-row{display:flex;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line2);font-size:13px}
+.review-row:last-child{border-bottom:none}
+.review-key{font-weight:600;color:var(--ink2);width:100px;flex-shrink:0}
+.review-val{color:var(--ink);flex:1}
+
+/* ── FLAG NOTE ── */
+.flag-note{display:flex;align-items:center;gap:7px;background:var(--rose-soft);border:1px solid #e8c8c4;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#7a2b22;margin-top:6px}
+.flag-note svg{flex-shrink:0;color:var(--rose)}
+
+/* ── DRAFTING ── */
+.orbit-ring{width:72px;height:72px;border-radius:99px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:hh-pulse 1.8s ease-in-out infinite;position:relative}
+.orbit-core{color:var(--teal);display:flex;align-items:center;justify-content:center}
+.draft-lines{display:flex;flex-direction:column;gap:12px;margin:16px 0 6px;width:88%}
+.draft-line{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--ink4);opacity:.5;transition:.35s}
+.draft-line.on{opacity:1;color:var(--ink)}
+.draft-ic{width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--teal);flex-shrink:0}
+.spin-dot{width:12px;height:12px;border-radius:99px;border:2px solid var(--teal-soft);display:block}
+.spin-dot.active{border-top-color:var(--teal);animation:hh-spin .7s linear infinite}
+
+/* ── PENDING ── */
+.pend-mark{width:64px;height:64px;border-radius:99px;background:var(--teal-soft);color:var(--teal-d);display:flex;align-items:center;justify-content:center;margin-bottom:18px;animation:hh-pulse 2s ease-in-out infinite}
+.escalation-note{display:flex;align-items:flex-start;gap:9px;background:var(--clay-soft);border:1px solid #ddb99a;border-radius:12px;padding:12px 13px;font-size:13px;line-height:1.45;color:#7a3e22;margin-top:16px}
+.escalation-note svg{flex-shrink:0;color:var(--clay);margin-top:1px}
+.sla-badge{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--ink3);margin-top:18px}
+
+/* ── PLAN VIEW ── */
+.plan-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:16px}
+.milestone-banner{display:flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border-radius:11px;padding:10px 13px;font-size:12.5px;font-weight:600;margin-bottom:14px;animation:hh-fade .3s ease}
+.milestone-close{background:transparent;border:none;color:#fff;cursor:pointer;margin-left:auto;display:flex;opacity:.7}
+.replan-banner{display:flex;align-items:center;gap:8px;background:var(--clay-soft);color:var(--clay);border:1px solid #d9a07a;border-radius:11px;padding:10px 13px;font-size:12.5px;font-weight:600;margin-bottom:14px}
+
+/* ── PROGRESS RING ── */
+.progress-ring{display:block;flex-shrink:0}
+.ring-label{font-size:11.5px;font-weight:700;fill:var(--teal-d)}
+
+/* ── THIS WEEK CARD ── */
+.this-week-card{position:relative;overflow:hidden;background:var(--ink);color:#fff;border-radius:var(--r-lg);padding:18px 18px 16px;margin-bottom:18px;animation:hh-rise .45s ease}
+.this-week-card::after{content:'';position:absolute;inset:0;background:radial-gradient(140% 80% at 108% -8%, rgba(159,210,200,.22),transparent 60%);pointer-events:none}
+.this-week-card>*{position:relative;z-index:1}
+.tw-eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#87c8bf;margin-bottom:6px}
+.tw-title{font-family:'Instrument Serif',Georgia,serif;font-size:18px;font-weight:400;margin-bottom:5px;line-height:1.2}
+.tw-action{font-size:13px;line-height:1.45;color:#cae0db;margin-bottom:10px}
+.tw-actions-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.task-chip{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);color:#cae0db;border:1px solid rgba(255,255,255,.15);border-radius:99px;font:inherit;font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;transition:background .15s}
+.task-chip.done{background:var(--teal);color:#fff;border-color:var(--teal)}
+.task-dot{width:7px;height:7px;border-radius:99px;background:rgba(255,255,255,.35);flex-shrink:0}
+
+/* ── PHASE / REC CARDS ── */
+.phase-block{margin-bottom:16px}
+.phase-label{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);padding-bottom:7px;margin-bottom:9px;border-bottom:1px solid var(--line)}
+.rec-card{border:1px solid var(--line);border-radius:var(--r-md);padding:12px 13px;margin-bottom:8px;background:var(--surface);animation:hh-rise .4s ease backwards;transition:transform .15s,border-color .18s,box-shadow .18s}
+.rec-card:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:var(--shadow-sm)}
+.rec-card.referral{background:var(--surface2);border-style:dashed}
+.rec-card.safety{background:var(--rose-soft);border-color:#dec9c6}
+.rec-card.safety:hover{border-color:var(--rose)}
+.rec-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.rec-icon{width:26px;height:26px;border-radius:7px;background:var(--teal-soft);color:var(--teal-d);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rec-card.safety .rec-icon{background:#fff;color:var(--rose)}
+.rec-title{font-size:13.5px;font-weight:600;flex:1}
+.cadence-pill{font-size:10.5px;font-weight:600;color:var(--ink3);background:var(--surface2);padding:3px 8px;border-radius:99px;white-space:nowrap}
+.rec-card.referral .cadence-pill,.rec-card.safety .cadence-pill{background:#fff}
+.rec-body{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+.plan-foot{display:flex;gap:9px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+
+/* ── EVIDENCE TOGGLE — the trust signature ── */
+.ev-wrap{margin-top:8px}
+.ev-btn{display:inline-flex;align-items:center;gap:5px;background:transparent;border:none;color:var(--teal);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:2px 0;transition:gap .15s}
+.ev-btn:hover{gap:8px}
+.ev-wrap.light .ev-btn{color:#87c8bf}
+.ev-chev{transition:transform .22s}
+.ev-chev.open{transform:rotate(180deg)}
+.ev-panel{margin-top:9px;border-left:2.5px solid var(--teal);padding:10px 0 2px 12px;animation:hh-evopen .25s ease}
+.ev-wrap.light .ev-panel{border-color:#4a9a8f}
+.ev-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.ev-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.02em}
+.ev-guideline{background:var(--teal-soft);color:var(--teal-d)}
+.ev-good{background:#e6eef4;color:#2e5268}
+.ev-referral{background:var(--clay-soft);color:#7a3e22}
+.ev-safety{background:var(--rose-soft);color:var(--rose)}
+.ev-src{font-size:10.5px;font-weight:600;color:var(--ink3)}
+.ev-wrap.light .ev-src{color:#87c8bf}
+.ev-rationale{font-size:12px;line-height:1.5;color:var(--ink2);margin-bottom:7px}
+.ev-wrap.light .ev-rationale{color:#cae0db}
+.ev-reviewer{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--teal-d)}
+.ev-wrap.light .ev-reviewer{color:#87c8bf}
+
+/* ── CHECK-IN ── */
+.back-btn{display:flex;align-items:center;gap:4px;background:transparent;border:none;color:var(--ink3);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px}
+.back-ic{transform:rotate(180deg)}
+.ci-section{margin-bottom:14px}
+.ci-label{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.ci-req{font-size:10.5px;font-weight:600;color:var(--rose);background:var(--rose-soft);padding:2px 7px;border-radius:99px}
+.mood-row{display:flex;gap:7px}
+.mood-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:9px 4px;cursor:pointer;font:inherit;font-size:11px;font-weight:600;color:var(--ink2);transition:border-color .15s,background .15s,transform .1s}
+.mood-btn:hover{border-color:var(--teal);transform:translateY(-1px)}
+.mood-btn.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d)}
+.mood-btn:active{transform:scale(.96)}
+
+/* ── PROGRESS ── */
+.metric-row{display:flex;gap:10px;margin-bottom:16px}
+.metric-card{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 11px}
+.metric-val{font-family:'Instrument Serif',Georgia,serif;font-size:24px;color:var(--ink);line-height:1}
+.metric-unit{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--ink3);margin-left:2px}
+.metric-label{font-size:11px;font-weight:600;color:var(--ink3);margin-top:4px}
+.metric-teal .metric-val{color:var(--teal-d)}
+.metric-clay .metric-val{color:var(--clay)}
+.chart-block{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r-md);padding:13px;margin-bottom:12px}
+.chart-label{font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:9px}
+.mini-chart{width:100%;overflow:visible}
+.chart-label-sm{font-size:9px;fill:var(--ink4)}
+.north-star-card{background:var(--ink);color:#fff;border-radius:var(--r-md);padding:14px 15px;margin-top:4px}
+.ns-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#87c8bf;margin-bottom:4px}
+.ns-val{font-family:'Instrument Serif',Georgia,serif;font-size:36px;line-height:1;margin-bottom:4px}
+.ns-desc{font-size:11.5px;color:#cae0db;line-height:1.4}
+.empty-state{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;color:var(--ink3);text-align:center}
+.empty-state svg{opacity:.5}
+
+/* ── NUDGE PANEL ── */
+.nudge-panel{width:220px;flex-shrink:0}
+.nudge-header{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--ink3);margin-bottom:8px;letter-spacing:.03em;text-transform:uppercase}
+.nudge-item{display:flex;align-items:flex-start;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 11px;font-size:12px;line-height:1.4;color:var(--ink2);margin-bottom:8px;animation:hh-rise .3s ease}
+.nudge-item svg{flex-shrink:0;margin-top:1px}
+.nudge-info svg{color:var(--teal)}
+.nudge-success{border-color:var(--teal-mid);background:var(--teal-soft)}
+.nudge-success svg{color:var(--teal)}
+.nudge-alert{border-color:#dec9c6;background:var(--rose-soft)}
+.nudge-alert svg{color:var(--rose)}
+.nudge-tip svg{color:var(--amber)}
+
+/* ── CONSOLE SHARED ── */
+.console{background:var(--surface);border:1px solid var(--cool-line);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-md);width:100%;max-width:820px;animation:hh-fade .3s ease}
+.console-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:80px 30px;color:var(--ink3)}
+.console-empty svg{opacity:.4;margin-bottom:4px}
+.console-empty h2{font-family:'Instrument Serif',Georgia,serif;font-size:22px;color:var(--ink)}
+.console-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:20px 24px;background:var(--cool);border-bottom:1px solid var(--cool-line);flex-wrap:wrap}
+.console-title{font-family:'Instrument Serif',Georgia,serif;font-size:22px;color:var(--ink);margin-top:3px}
+.console-meta{font-size:12.5px;color:var(--ink2);margin-top:5px}
+.console-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:99px;white-space:nowrap}
+.pill-ok{background:var(--teal-soft);color:var(--teal-d)}
+.pill-wait{background:var(--amber-soft);color:#6b4d0c}
+.pulse-dot{width:7px;height:7px;border-radius:99px;background:#9a7014;animation:hh-blink 1.4s ease-in-out infinite;display:inline-block}
+.sla-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:99px;background:var(--teal-soft);color:var(--teal-d)}
+.sla-risk{background:var(--rose-soft)!important;color:var(--rose)!important}
+.console-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 24px}
+.ctab{border:none;background:transparent;font:inherit;font-size:13px;font-weight:600;color:var(--ink3);padding:12px 16px;cursor:pointer;border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s;margin-bottom:-1px}
+.ctab.on{color:var(--teal-d);border-bottom-color:var(--teal)}
+.ctab:hover:not(.on){color:var(--ink2)}
+.console-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;background:var(--cool);border-top:1px solid var(--cool-line);flex-wrap:wrap}
+.released-msg{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--teal-d);margin-right:auto;animation:hh-rise .3s ease}
+
+/* ── ESCALATION FLAG ── */
+.escalation-flag{display:flex;align-items:flex-start;gap:12px;margin:16px 24px 0;background:var(--rose-soft);border:1px solid #e0bebb;border-radius:var(--r-md);padding:13px 15px;flex-wrap:wrap}
+.escalation-flag>svg{color:var(--rose);flex-shrink:0;margin-top:2px}
+.flag-body{flex:1;min-width:180px;font-size:12.5px;line-height:1.45;color:#6e2820}
+.flag-body b{color:var(--rose)}
+.flag-done{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--rose)}
+.escalation-flag.acked{opacity:.65}
+
+/* ── REVIEW LIST ── */
+.review-list{padding:14px 24px}
+.rrec{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);animation:hh-rise .38s ease backwards;transition:opacity .2s}
+.rrec:last-child{border-bottom:none}
+.rrec.off{opacity:.4}
+.rrec-icon{width:30px;height:30px;border-radius:8px;background:var(--cool);color:var(--teal-d);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rrec-main{flex:1}
+.rrec-top{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+.rrec-title{font-size:13.5px;font-weight:600}
+.rrec-action{font-size:12px;color:var(--ink2);line-height:1.4;margin-bottom:4px}
+.rrec-ev{font-size:11px;color:var(--ink3);line-height:1.45}
+.rrec-toggle{align-self:flex-start;border:1px solid var(--line);background:#fff;color:var(--ink2);font:inherit;font-size:11px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s}
+.rrec-toggle:hover{border-color:var(--rose);color:var(--rose)}
+.rrec-toggle.restore:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ── AUDIT ── */
+.audit-list{padding:14px 24px}
+.audit-empty{color:var(--ink3);font-size:13px;padding:16px 0}
+.audit-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line2);font-size:11.5px}
+.audit-ts{color:var(--ink3);flex-shrink:0}
+.audit-action{font-weight:600;color:var(--teal-d)}
+.audit-data{color:var(--ink2);font-family:monospace;font-size:10.5px;word-break:break-all}
+
+/* ── COORDINATOR ── */
+.coord-queue{padding:14px 24px}
+.queue-clear{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;color:var(--teal-d);padding:20px 0}
+.queue-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.queue-item:last-child{border-bottom:none}
+.queue-item.handled{color:var(--ink3);font-size:12.5px;gap:8px}
+.qi-left{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:200px}
+.qi-dot{width:9px;height:9px;border-radius:99px;flex-shrink:0;margin-top:5px}
+.dot-high{background:var(--rose)}
+.dot-med{background:var(--amber)}
+.dot-low{background:var(--teal)}
+.qi-label{font-size:13.5px;font-weight:600;color:var(--ink)}
+.qi-desc{font-size:12px;color:var(--ink3);margin-top:2px}
+.handled-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+/* timeline */
+.timeline{padding:14px 24px}
+.tl-member{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.tl-member b{font-weight:700}
+.tl-event{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-left:2px solid var(--line);padding-left:14px;margin-left:4px;font-size:12.5px;color:var(--ink2);position:relative}
+.tl-dot{width:9px;height:9px;border-radius:99px;background:var(--line);position:absolute;left:-5px;top:12px;flex-shrink:0}
+.tl-plan .tl-dot{background:var(--teal)}
+.tl-checkin .tl-dot{background:var(--teal-mid)}
+.tl-flag .tl-dot{background:var(--rose)}
+.tl-empty{color:var(--ink4);font-size:12.5px;padding:12px 0;margin-left:18px}
+/* message */
+.msg-panel{padding:16px 24px}
+.msg-to{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.msg-note{font-size:11px;color:var(--ink3);margin-top:9px;line-height:1.4}
+
+/* ── KEYFRAMES ── */
+@keyframes hh-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes hh-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes hh-evopen{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes hh-pop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes hh-settle{0%{transform:scale(.76)}55%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes hh-pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(27,107,95,.2)}50%{transform:scale(1.04);box-shadow:0 0 0 12px rgba(27,107,95,0)}}
+@keyframes hh-spin{to{transform:rotate(360deg)}}
+@keyframes hh-blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.stage{max-width:820px}}
+@media(max-width:900px){
+  .phone-wrap{flex-direction:column;align-items:center}
+  .nudge-panel{width:100%;max-width:390px}
+  .console{max-width:100%}
+}
+@media(max-width:680px){
+  .topbar{gap:8px;padding:12px 14px}
+  .roletoggle{order:3;width:100%;max-width:none}
+  .rolebtn{font-size:12px;padding:8px 10px}
+  .stage{padding:14px 12px 0}
+  .phone{width:100%;max-width:none;background:transparent;padding:0;border-radius:0;box-shadow:none}
+  .phone-notch,.phone-home{display:none}
+  .phone-screen{border-radius:18px;border:1px solid var(--line);min-height:auto}
+  .screen{padding:20px 16px 22px}
+  .h-display{font-size:26px}
+  .h-screen{font-size:20px}
+  .btn{padding:13px 16px}
+  .console{border-radius:var(--r-lg)}
+  .console-foot{flex-direction:column}
+  .console-foot .btn{width:100%}
+  .console-head{flex-direction:column}
+  .metric-row{flex-wrap:wrap}
+  .metric-card{min-width:calc(50% - 5px)}
+}
+@media(max-width:460px){
+  .rrec{flex-wrap:wrap}
+  .rrec-toggle{margin-left:42px}
+  .queue-item{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){.app *{animation:none!important;transition:none!important}}
+`;
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ═══════════════════════════════════════════════════════════
+   FOUNDATIONS — Part 0 implemented in-browser
+   Data model, state machine, rules engine, evidence contract
+   Module library seed (from module-library.seed.json)
+═══════════════════════════════════════════════════════════ */
+
+// 0.2 Canonical objects (in-memory for demo)
+const createMember = () => ({ id: "m1", name: "Priya S.", email: "priya@example.com" });
+const createAuditLog = () => [];
+function auditLog(log, action, data) { log.push({ ts: new Date().toISOString(), action, data }); return log; }
+
+// 0.3 CarePlan state machine
+const PLAN_STATES = { DRAFT:"draft", PENDING:"pending_review", CHANGES:"changes_requested", APPROVED:"approved", PUBLISHED:"published", REJECTED:"rejected", ARCHIVED:"archived" };
+function canTransition(from, to) {
+  const allowed = {
+    draft:["pending_review","archived"],
+    pending_review:["approved","changes_requested","rejected"],
+    changes_requested:["draft","archived"],
+    approved:["published","archived"],
+    published:["draft","archived"], // re-plan
+    rejected:["archived"],
+  };
+  return (allowed[from]||[]).includes(to);
+}
+
+// 0.4 Evidence contract — the ModuleLibrary (Spine C)
+const SRC = "2023 Intl. Evidence-Based PCOS Guideline";
+const REVIEWER = "Dr. Anjali Rao, MD";
+const EV_LEVELS = { guideline:"Guideline-backed", good:"Good-practice", referral:"Clinician-led", safety:"Safety" };
+
+const MODULE_LIBRARY = [
+  { id:"understand", phase:1, kind:"self", icon:"book", always:true, title:"Understand your PCOS",
+    action:"Read a 3-minute primer on what PCOS is and why lifestyle helps even without weight change.",
+    cadence:"Once this week", goals:["all"],
+    evidence:{ claim:"Patient education improves PCOS care outcomes.", rationale:"The guideline strongly recommends high-quality patient education and shared decision-making as the foundation of all care.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"track", phase:1, kind:"self", icon:"clipboard", always:true, thisWeek:true, title:"Track your cycle & top symptom",
+    action:"Log your period days and most bothersome symptom — 30 seconds a day.",
+    cadence:"Daily · 30 sec", goals:["cycle","fertility","all"],
+    evidence:{ claim:"Self-monitoring enables personalised, adaptive care.", rationale:"Tracking turns vague symptoms into patterns your clinician can act on, and feeds the weekly plan update.", level:"good", source:SRC, reviewed_by:REVIEWER }},
+  { id:"move", phase:1, kind:"self", icon:"footprints", always:true, title:"Build gentle movement",
+    action:"Start with a 20–30 min brisk walk most days, building toward 150–300 min/week.",
+    cadence:"5×/week", goals:["all","metabolic"],
+    evidence:{ claim:"Regular aerobic activity improves metabolic health and wellbeing in PCOS.", rationale:"Guideline activity targets (150–300 min/week moderate) improve metabolic health — with benefits even without weight loss.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"sedentary", phase:1, kind:"self", icon:"activity", always:true, title:"Break up sitting",
+    action:"Stand or move for 2 minutes every hour you're sitting.",
+    cadence:"Daily", goals:["all"],
+    evidence:{ claim:"Reducing sedentary time provides health benefits independent of exercise.", rationale:"Replacing sedentary time with light activity of any intensity provides health benefits per the guideline.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"sleep", phase:1, kind:"self", icon:"moon", always:true, title:"Steady your sleep",
+    action:"Aim for consistent sleep and wake times. Note loud snoring or daytime fatigue for your next consult.",
+    cadence:"Daily", goals:["all","mood"],
+    evidence:{ claim:"Sleep problems are more prevalent in PCOS and warrant screening.", rationale:"The guideline recognises sleep disorders as more common in PCOS; consistent sleep and screening are core to care.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"wellbeing", phase:1, kind:"self", icon:"heart", always:true, title:"Protect your emotional wellbeing",
+    action:"Try one 5-minute stress-reset each day — a breathing or wind-down practice.",
+    cadence:"Daily", goals:["all","mood"],
+    evidence:{ claim:"Emotional wellbeing is a core outcome in PCOS care, not secondary.", rationale:"Anxiety and low mood are very common in PCOS. The guideline makes emotional wellbeing and quality of life core to care.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"mood-screen", phase:1, kind:"self", icon:"brain", always:true, title:"Weekly mood screening",
+    action:"Answer two short mood questions in your weekly check-in so we can act early if needed.",
+    cadence:"Weekly", goals:["all","mood"],
+    evidence:{ claim:"Routine screening for anxiety and depression is recommended in PCOS.", rationale:"The guideline recommends routine anxiety and depression screening. These questions are how the plan detects when to involve more support.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"eating", phase:2, kind:"self", icon:"salad", always:true, title:"A sustainable eating pattern",
+    action:"Aim for regular, balanced meals you can sustain. There is no single PCOS diet.",
+    cadence:"Ongoing", goals:["all","metabolic"],
+    evidence:{ claim:"No single diet is superior in PCOS; sustainability matters more than regimen.", rationale:"The guideline finds no one diet superior. Framing is around health and sustainability, never restriction.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"strength", phase:2, kind:"self", icon:"dumbbell", always:true, title:"Add light strength work",
+    action:"Two short muscle-strengthening sessions a week — bodyweight counts.",
+    cadence:"2×/week", goals:["all","metabolic"],
+    evidence:{ claim:"Strength activity supports metabolic health in PCOS.", rationale:"Strength activity is consistent with population physical-activity guidance the PCOS guideline aligns to.", level:"guideline", source:SRC, reviewed_by:REVIEWER }},
+  { id:"skin", phase:2, kind:"referral", icon:"sparkles", always:false, title:"Skin & hair — what actually helps",
+    action:"Lifestyle helps gradually. For faster options, discuss medical treatments with your clinician.",
+    cadence:"Next consult", goals:["skin"],
+    when:{ symptoms:["skinhair"], primary_goal:["skin"] },
+    evidence:{ claim:"Pharmacological skin/hair options are clinician-led in PCOS care.", rationale:"The guideline keeps pharmacological options for skin/hair features clinician-led. The app routes, never prescribes.", level:"referral", source:SRC, reviewed_by:REVIEWER }},
+  { id:"metabolic-screen", phase:2, kind:"referral", icon:"flask", always:false, title:"Check your metabolic health",
+    action:"Ask your clinician about screening your blood sugar and cholesterol.",
+    cadence:"Next consult", goals:["metabolic"],
+    when:{ symptoms:["weight"], primary_goal:["metabolic"], conditions:["Insulin resistance","Type-2 diabetes"] },
+    evidence:{ claim:"Metabolic risk screening is clinician-led in PCOS.", rationale:"Insulin resistance and metabolic risk are recognised features. Screening decisions sit with your clinician.", level:"referral", source:SRC, reviewed_by:REVIEWER }},
+  { id:"fertility", phase:1, kind:"referral", icon:"stethoscope", always:false, title:"Planning for pregnancy",
+    action:"Bring your timeline to a clinician — they'll guide safe, evidence-based options. Keep tracking cycles.",
+    cadence:"Book a consult", goals:["fertility"],
+    when:{ primary_goal:["fertility"] },
+    evidence:{ claim:"Fertility management should be evidence-based and clinician-led.", rationale:"The guideline emphasises safer, clinician-led fertility management. The plan prepares you for that conversation.", level:"referral", source:SRC, reviewed_by:REVIEWER }},
+  { id:"safety", phase:1, kind:"safety", icon:"shield", always:true, title:"When to reach out sooner",
+    action:"Message your care companion immediately if symptoms change sharply — don't wait for your check-in.",
+    cadence:"As needed", goals:["all"],
+    evidence:{ claim:"A clear escalation path is a basic clinical safety requirement.", rationale:"Every care plan should always tell you when not to wait. Escalation paths are non-negotiable.", level:"safety", source:SRC, reviewed_by:REVIEWER }},
+];
+
+// 0.2 Rules engine (US-1.C2) — Spine C
+function assemblePlan(intake) {
+  const flags = {
+    skin: !!intake.symptoms.skinhair,
+    metabolic: !!intake.symptoms.weight || intake.primaryGoal==="metabolic" || intake.conditions.includes("Insulin resistance") || intake.conditions.includes("Type-2 diabetes"),
+    fertility: intake.primaryGoal==="fertility",
+  };
+  const moodMarked = intake.symptoms.mood?.sev==="Marked";
+  const chosen = MODULE_LIBRARY.filter(m => {
+    if (m.always) return true;
+    if (!m.when) return false;
+    return (m.when.symptoms||[]).some(s=>intake.symptoms[s]) ||
+           (m.when.primary_goal||[]).includes(intake.primaryGoal) ||
+           (m.when.conditions||[]).some(c=>intake.conditions.includes(c));
+  });
+  const goalBoost = m =>
+    (intake.primaryGoal==="fertility"&&m.id==="fertility")||(intake.primaryGoal==="cycle"&&m.id==="track")||
+    (intake.primaryGoal==="metabolic"&&(m.id==="move"||m.id==="metabolic-screen"))||(intake.primaryGoal==="skin"&&m.id==="skin")||
+    (intake.primaryGoal==="mood"&&(m.id==="wellbeing"||m.id==="mood-screen")) ? 0 : 1;
+  const ordered = [...chosen].sort((a,b)=>a.phase-b.phase||goalBoost(a)-goalBoost(b));
+  // build week-1 actions
+  const week1 = ordered.filter(m=>m.kind==="self").slice(0,3).map((m,i)=>({ id:m.id+"_w1", moduleId:m.id, week:1, title:m.title, status:"pending", primary: i===0 }));
+  return { modules:ordered, week1Actions:week1, escalation:moodMarked, primaryGoal:intake.primaryGoal, version:1, status:PLAN_STATES.DRAFT };
+}
+
+// Red-flag rules (US-4.C1)
+function checkRedFlags(input) {
+  const flags = [];
+  if (input.symptoms?.mood?.sev==="Marked") flags.push({ trigger:"marked_low_mood", severity:"high", msg:"You mentioned you've been feeling quite low. A care companion will check in with you." });
+  if (input.symptoms?.cycle?.sev==="Marked") flags.push({ trigger:"marked_cycle_disturbance", severity:"medium", msg:"Significant cycle changes noted — flagged for your clinician." });
+  return flags;
+}
+
+// Check-in milestone detection (US-3.C3)
+function detectMilestone(checkins) {
+  if (checkins.length===1) return { hit:true, msg:"First check-in complete — your plan is now adapting to you. Keep it up." };
+  if (checkins.length===4) return { hit:true, msg:"4 weeks in — you've built a real tracking habit. Your clinician will review your progress soon." };
+  return { hit:false };
+}
+
+// Re-plan trigger (US-7.C1)
+function shouldReplan(checkins) {
+  const weeks = checkins.length;
+  return weeks>0 && (weeks%4===0);
+}
+
+/* ═══════════════════════════════════════════════════════
+   INLINE SVG ICON SYSTEM
+═══════════════════════════════════════════════════════ */
+const PATHS = {
+  "check":'<polyline points="20 6 9 17 4 12"/>',
+  "x":'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  "chevron-down":'<polyline points="6 9 12 15 18 9"/>',
+  "chevron-right":'<polyline points="9 6 15 12 9 18"/>',
+  "shield":'<path d="M12 3l7 3v6c0 4-3 6.7-7 8-4-1.3-7-4-7-8V6z"/><polyline points="9 12 11 14 15 10"/>',
+  "activity":'<polyline points="3 12 7 12 10 5 14 19 17 12 21 12"/>',
+  "moon":'<path d="M21 12.5A8.5 8.5 0 1 1 11.5 3 6.5 6.5 0 0 0 21 12.5z"/>',
+  "brain":'<path d="M12 5a3 3 0 0 0-6 .5A3 3 0 0 0 4 11a3 3 0 0 0 2.5 4.9A3 3 0 0 0 12 19zM12 5a3 3 0 0 1 6 .5A3 3 0 0 1 20 11a3 3 0 0 1-2.5 4.9A3 3 0 0 1 12 19z"/>',
+  "stethoscope":'<path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M9 12v2a5 5 0 0 0 10 0v-1"/><circle cx="19" cy="11" r="2"/>',
+  "sparkles":'<path d="M12 3l1.7 4.6L18 9l-4.3 1.4L12 15l-1.7-4.6L6 9l4.3-1.4z"/><path d="M19 14l.8 2.1L22 17l-2.2.9L19 20l-.8-2.1L16 17l2.2-.9z"/>',
+  "clipboard":'<rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/>',
+  "alert":'<path d="M12 4l9 16H3z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17.5" r=".5" fill="currentColor"/>',
+  "arrow-right":'<line x1="4" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>',
+  "rotate":'<polyline points="3 4 3 9 8 9"/><path d="M4 13a8 8 0 1 0 2-6L3 9"/>',
+  "user":'<circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+  "users":'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  "flask":'<path d="M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><line x1="9" y1="3" x2="15" y2="3"/><line x1="7.5" y1="15" x2="16.5" y2="15"/>',
+  "calendar":'<rect x="4" y="5" width="16" height="16" rx="2"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="16" y1="3" x2="16" y2="6"/><polyline points="9 14 11 16 15 12"/>',
+  "book":'<path d="M12 6C10 4.5 6.5 4.3 4 5.2v13C6.5 17.3 10 17.5 12 19c2-1.5 5.5-1.7 8-.8v-13C17.5 4.3 14 4.5 12 6z"/><line x1="12" y1="6.4" x2="12" y2="19"/>',
+  "footprints":'<ellipse cx="8" cy="8" rx="2.4" ry="3.6"/><ellipse cx="16" cy="13" rx="2.4" ry="3.6"/><path d="M6 13c-.5 2 .2 3.5 2 3.5s2.3-1.3 2-3"/><path d="M14 18c-.5 2 .2 3.5 2 3.5s2.3-1.3 2-3"/>',
+  "heart":'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  "dumbbell":'<line x1="6.5" y1="6.5" x2="17.5" y2="17.5"/><line x1="8" y1="5" x2="5" y2="8"/><line x1="19" y1="16" x2="16" y2="19"/><line x1="9" y1="3" x2="3" y2="9"/><line x1="21" y1="15" x2="15" y2="21"/>',
+  "salad":'<path d="M4 12h16a8 8 0 0 1-16 0z"/><path d="M7.5 12a4.5 4.5 0 0 1 9 0"/><line x1="12" y1="3.5" x2="12" y2="7.5"/>',
+  "trending":'<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  "bell":'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  "clock":'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>',
+  "info":'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/>',
+  "eye":'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  "send":'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  "plus":'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+};
+function Ic({ n, size=16, cls="" }) {
+  return <svg className={cls} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: PATHS[n]||PATHS["info"] }} />;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INTAKE CONTENT
+═══════════════════════════════════════════════════════ */
+const SYMPTOMS_LIST = [
+  { key:"cycle", label:"Irregular or missed periods", icon:"calendar" },
+  { key:"skinhair", label:"Acne, skin changes or unwanted hair", icon:"sparkles" },
+  { key:"weight", label:"Weight or energy changes", icon:"activity" },
+  { key:"mood", label:"Low mood, anxiety or stress", icon:"brain" },
+];
+const GOALS_LIST = [
+  { key:"cycle", label:"More regular cycles", desc:"Track and stabilise your period pattern" },
+  { key:"fertility", label:"Trying to conceive", desc:"Prepare your body and the conversation" },
+  { key:"metabolic", label:"Weight & metabolic health", desc:"Improve energy, insulin, and movement" },
+  { key:"skin", label:"Skin & hair", desc:"Manage acne and hair concerns" },
+  { key:"mood", label:"Mood & energy", desc:"Support mental health and vitality" },
+];
+const CONDITIONS_LIST = ["Thyroid condition","Insulin resistance","Type-2 diabetes","None of these"];
+const SEV = ["Mild","Moderate","Marked"];
+const PHASE_LABELS = { 1:"Days 1–30 · Foundations", 2:"Days 31–60 · Build", 3:"Days 61–90 · Consolidate" };
+const DRAFT_SEQ = ["Matching your goals to the evidence library\u2026","Selecting care modules for your profile\u2026","Assembling your personalised 90-day plan\u2026"];
+const WEEK_LABELS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+/* ═══════════════════════════════════════════════════════
+   ROOT APP
+═══════════════════════════════════════════════════════ */
+function App() {
+  const [role, setRole] = useState("member");
+  // member state
+  const [memberStep, setMemberStep] = useState("welcome"); // welcome|intake|drafting|pending|plan|checkin|progress|replan
+  const [iStep, setIStep] = useState(0);
+  const [intake, setIntake] = useState({ symptoms:{}, primaryGoal:null, diagnosed:null, conditions:[], meds:[], note:"" });
+  const [plan, setPlan] = useState(null);
+  const [planStatus, setPlanStatus] = useState(PLAN_STATES.DRAFT);
+  const [checkins, setCheckins] = useState([]);
+  const [completedActions, setCompletedActions] = useState({});
+  const [openEvidence, setOpenEvidence] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  const [replanPending, setReplanPending] = useState(false);
+  const [milestone, setMilestone] = useState(null);
+  // clinician state
+  const [clinApproved, setClinApproved] = useState({});
+  const [clinRemoved, setClinRemoved] = useState({});
+  const [clinAck, setClinAck] = useState(false);
+  const [slaStart] = useState(Date.now());
+  // coordinator state
+  const [coordHandled, setCoordHandled] = useState({});
+  const [coordNote, setCoordNote] = useState("");
+  // audit
+  const auditRef = useRef([]);
+  const timers = useRef([]);
+  useEffect(()=>()=>timers.current.forEach(clearTimeout),[]);
+
+  function addNotif(msg, type="info") { setNotifications(n=>[{ id:Date.now(), msg, type },...n.slice(0,4)]); }
+
+  function startDraft() {
+    const p = assemblePlan(intake);
+    const redFlags = checkRedFlags(intake);
+    setPlan({ ...p, redFlags });
+    setPlanStatus(PLAN_STATES.PENDING);
+    auditRef.current = auditLog(auditRef.current, "plan_state_change", { from:"draft", to:"pending_review" });
+    setMemberStep("drafting");
+    timers.current.push(setTimeout(()=>setMemberStep("pending"), 2800));
+    addNotif("Your plan is now with Dr. Rao for review.","info");
+  }
+
+  function approvePlan() {
+    setPlanStatus(PLAN_STATES.PUBLISHED);
+    auditRef.current = auditLog(auditRef.current, "plan_state_change", { from:"approved", to:"published", by:"Dr. Rao" });
+    setMemberStep("plan");
+    addNotif("Plan approved and released to Priya.","success");
+  }
+
+  function submitCheckin(data) {
+    const newCheckins = [...checkins, { ...data, week: checkins.length+1, ts: new Date().toISOString() }];
+    setCheckins(newCheckins);
+    auditRef.current = auditLog(auditRef.current, "checkin_submitted", { week: newCheckins.length });
+    const m = detectMilestone(newCheckins);
+    if (m.hit) setMilestone(m.msg);
+    const replan = shouldReplan(newCheckins);
+    if (replan) { setReplanPending(true); addNotif("Time for your plan check-in — a re-plan has been drafted for review.","info"); }
+    const flags = checkRedFlags({ symptoms: { mood: { sev: data.mood } } });
+    if (flags.length) { addNotif(flags[0].msg,"alert"); }
+    addNotif("Check-in saved. Great job staying consistent.","success");
+    setMemberStep("plan");
+  }
+
+  function reset() {
+    setRole("member"); setMemberStep("welcome"); setIStep(0);
+    setIntake({ symptoms:{}, primaryGoal:null, diagnosed:null, conditions:[], meds:[], note:"" });
+    setPlan(null); setPlanStatus(PLAN_STATES.DRAFT); setCheckins([]); setCompletedActions({});
+    setOpenEvidence({}); setNotifications([]); setReplanPending(false); setMilestone(null);
+    setClinApproved({}); setClinRemoved({}); setClinAck(false); setCoordHandled({}); setCoordNote("");
+    auditRef.current = [];
+  }
+
+  // Reset coordinator "handled" flags when new check-ins arrive
+  // so fresh check-in items always appear as open, not pre-handled
+  useEffect(() => {
+    if (checkins.length > 0) {
+      setCoordHandled(prev => {
+        const next = {};
+        // keep escalation/milestone flags; clear per-checkin handled flags
+        // so new check-ins always surface as open
+        if (prev["escalation"]) next["escalation"] = true;
+        if (prev["milestone-4"]) next["milestone-4"] = true;
+        // keep first-checkin ack only if it was explicitly acknowledged AFTER checkin arrived
+        if (prev["first-checkin"] && checkins.length > 0) next["first-checkin"] = true;
+        // carry forward per-checkin acks that still match current checkins
+        checkins.forEach((_, i) => {
+          const key = "checkin-w"+(i+2);
+          if (prev[key]) next[key] = true;
+        });
+        return next;
+      });
+    }
+  }, [checkins.length]);
+
+  const sharedProps = { plan, planStatus, checkins, completedActions, setCompletedActions, openEvidence, setOpenEvidence, notifications, setNotifications, milestone, setMilestone, replanPending, setReplanPending };
+
+  return (
+    <div className="app">
+      <style>{CSS_STYLES}</style>
+      <TopBar role={role} setRole={setRole} onReset={reset} notifications={notifications} />
+      <div className="ribbon">Prototype · content modelled on {SRC} · illustrative · not medical advice</div>
+      <HintBar role={role} step={memberStep} status={planStatus} escalation={plan?.escalation} replan={replanPending} />
+
+      <main className="stage">
+        {role==="member" && (
+          <div className="phone-wrap">
+            <PhoneFrame>
+              {memberStep==="welcome" && <Welcome onStart={()=>setMemberStep("intake")} />}
+              {memberStep==="intake" && <Intake iStep={iStep} setIStep={setIStep} intake={intake} setIntake={setIntake} onSubmit={startDraft} />}
+              {memberStep==="drafting" && <Drafting seq={DRAFT_SEQ} />}
+              {memberStep==="pending" && <Pending escalation={plan?.escalation} />}
+              {memberStep==="plan" && <PlanView {...sharedProps} onCheckin={()=>setMemberStep("checkin")} onProgress={()=>setMemberStep("progress")} />}
+              {memberStep==="checkin" && <CheckinView checkins={checkins} onSubmit={submitCheckin} onBack={()=>setMemberStep("plan")} />}
+              {memberStep==="progress" && <ProgressView checkins={checkins} plan={plan} onBack={()=>setMemberStep("plan")} />}
+            </PhoneFrame>
+            <NudgePanel notifications={notifications} step={memberStep} checkins={checkins} />
+          </div>
+        )}
+        {role==="clinician" && (
+          <ClinicianConsole plan={plan} planStatus={planStatus} onApprove={approvePlan}
+            clinRemoved={clinRemoved} setClinRemoved={setClinRemoved}
+            clinApproved={clinApproved} setClinApproved={setClinApproved}
+            clinAck={clinAck} setClinAck={setClinAck} slaStart={slaStart} auditLog={auditRef.current} />
+        )}
+        {role==="coordinator" && (
+          <CoordinatorConsole plan={plan} planStatus={planStatus} checkins={checkins}
+            coordHandled={coordHandled} setCoordHandled={setCoordHandled}
+            coordNote={coordNote} setCoordNote={setCoordNote}
+            escalation={plan?.escalation} notifications={notifications} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+/* ═══ TOP BAR ═══ */
+function TopBar({ role, setRole, onReset, notifications }) {
+  const ROLES = [{ k:"member", label:"Member", icon:"user" }, { k:"clinician", label:"Clinician", icon:"stethoscope" }, { k:"coordinator", label:"Coordinator", icon:"users" }];
+  const idx = ROLES.findIndex(r=>r.k===role);
+  const unread = notifications.filter(n=>n.type==="alert").length;
+  return (
+    <header className="topbar">
+      <div className="topbar-brand">
+        <span className="brand-logo">Humm</span>
+        <span className="brand-sub">Her Health Hub · PCOS V1</span>
+      </div>
+      <div className={"roletoggle role-"+role} >
+        <span className="role-slider" />
+        {ROLES.map(r=>(
+          <button key={r.k} className={"rolebtn"+(role===r.k?" on":"")} onClick={()=>setRole(r.k)}>
+            <Ic n={r.icon} size={14} />{r.label}
+          </button>
+        ))}
+      </div>
+      <div className="topbar-right">
+        {unread>0 && <span className="notif-dot">{unread}</span>}
+        <button className="reset-btn" onClick={onReset}><Ic n="rotate" size={13} /> Restart</button>
+      </div>
+    </header>
+  );
+}
+
+/* ═══ HINT BAR ═══ */
+function HintBar({ role, step, status, escalation, replan }) {
+  let msg=null;
+  if (role==="member"&&step==="welcome") msg="Start the intake to build your personalised plan.";
+  else if (role==="member"&&step==="pending") msg="Switch to Clinician tab → approve the plan → come back to see it.";
+  else if (role==="member"&&step==="plan"&&status===PLAN_STATES.PUBLISHED) msg="Plan live. Try a check-in, explore evidence cards, or check your progress.";
+  else if (role==="clinician"&&status===PLAN_STATES.PENDING) msg=escalation?"Wellbeing flag present — acknowledge before releasing.":"Review each recommendation then approve to release.";
+  else if (role==="clinician"&&status===PLAN_STATES.PUBLISHED) msg="Plan released. Switch to Member to see the live view.";
+  else if (role==="coordinator"&&status===PLAN_STATES.DRAFT) msg="Complete the member intake first.";
+  else if (role==="coordinator") msg="Coordinator console — triage the queue, message members, handle escalations.";
+  if (replan&&role==="member") msg="A plan update is ready — switch to Clinician to review and release.";
+  if (!msg) return null;
+  return <div className="hintbar"><Ic n="arrow-right" size={13} />{msg}</div>;
+}
+
+/* ═══ PHONE FRAME ═══ */
+function PhoneFrame({ children }) {
+  return (
+    <div className="phone">
+      <div className="phone-notch"><div className="phone-cam"/></div>
+      <div className="phone-screen">{children}</div>
+      <div className="phone-home"/>
+    </div>
+  );
+}
+
+/* ═══════════════════ MEMBER SCREENS ═══════════════════ */
+
+/* WELCOME — US-1.C1 screen 1 */
+function Welcome({ onStart }) {
+  return (
+    <div className="screen screen-welcome">
+      <div className="welcome-leaf" aria-hidden="true">
+        <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 10 C10 40 5 100 60 150 C115 100 110 40 60 10z" fill="var(--teal-soft)" opacity=".7"/>
+          <path d="M60 10 C60 10 60 80 60 150" stroke="var(--teal)" strokeWidth="1.5" strokeDasharray="4 4"/>
+        </svg>
+      </div>
+      <div className="eyebrow">Her Health Hub</div>
+      <h1 className="h-display">Your PCOS, <em>guided.</em></h1>
+      <p className="body-lead">A personalised 90-day plan built from clinical evidence, reviewed by a doctor before it reaches you.</p>
+      <ul className="trust-list">
+        <li><Ic n="shield" size={14}/> Clinician-reviewed before you see it</li>
+        <li><Ic n="book" size={14}/> Every step shows its evidence</li>
+        <li><Ic n="clock" size={14}/> Under 3 minutes to set up</li>
+      </ul>
+      <div className="consent-note">By continuing you consent to Humm storing your health data per our privacy policy. You can withdraw at any time.</div>
+      <button className="btn btn-primary btn-block mt-auto" onClick={onStart}>Get started <Ic n="arrow-right" size={16} cls="btn-arrow"/></button>
+    </div>
+  );
+}
+
+/* INTAKE — US-1.C1 screens 2–6 */
+function Intake({ iStep, setIStep, intake, setIntake, onSubmit }) {
+  const STEPS = ["Symptoms","Goals","History","Review"];
+  const set = p => setIntake(s=>({...s,...p}));
+  const toggleSym = k => setIntake(s=>{ const sy={...s.symptoms}; if(sy[k]) delete sy[k]; else sy[k]={sev:"Mild"}; return{...s,symptoms:sy}; });
+  const setSev = (k,v) => setIntake(s=>({...s,symptoms:{...s.symptoms,[k]:{sev:v}}}));
+  const toggleCond = c => setIntake(s=>{ let a=s.conditions.includes(c)?s.conditions.filter(x=>x!==c):[...s.conditions,c]; if(c==="None of these") a=s.conditions.includes(c)?[]:["None of these"]; else a=a.filter(x=>x!=="None of these"); return{...s,conditions:a}; });
+  const canNext = (iStep===0&&Object.keys(intake.symptoms).length>0)||(iStep===1&&intake.primaryGoal)||iStep>=2;
+  const redFlags = checkRedFlags(intake);
+
+  return (
+    <div className="screen">
+      <StepDots n={STEPS.length} i={iStep} labels={STEPS}/>
+      {iStep===0&&(<>
+        <h2 className="h-screen">What's been bothering you?</h2>
+        <p className="screen-sub">Select all that apply, then set how much each affects you.</p>
+        <div className="sym-list">
+          {SYMPTOMS_LIST.map(s=>{
+            const on=!!intake.symptoms[s.key];
+            return (<div key={s.key} className={"sym-card"+(on?" on":"")}>
+              <button className="sym-head" onClick={()=>toggleSym(s.key)}>
+                <span className="sym-icon"><Ic n={s.icon} size={16}/></span>
+                <span className="sym-label">{s.label}</span>
+                <span className={"sym-check"+(on?" on":"")}>{on&&<Ic n="check" size={12}/>}</span>
+              </button>
+              {on&&<div className="sev-row">{SEV.map(v=><button key={v} className={"sev-btn"+(intake.symptoms[s.key].sev===v?" on":"")} onClick={()=>setSev(s.key,v)}>{v}</button>)}</div>}
+            </div>);
+          })}
+        </div>
+        {redFlags.length>0&&<div className="flag-note"><Ic n="alert" size={13}/> {redFlags[0].msg}</div>}
+      </>)}
+
+      {iStep===1&&(<>
+        <h2 className="h-screen">What matters most right now?</h2>
+        <p className="screen-sub">Your top goal shapes the first 30 days.</p>
+        <div className="goals-list">
+          {GOALS_LIST.map(g=>(
+            <button key={g.key} className={"goal-card"+(intake.primaryGoal===g.key?" on":"")} onClick={()=>set({primaryGoal:g.key})}>
+              <div className="goal-dot"/>
+              <div className="goal-text"><span className="goal-label">{g.label}</span><span className="goal-desc">{g.desc}</span></div>
+              {intake.primaryGoal===g.key&&<Ic n="check" size={15} cls="goal-check"/>}
+            </button>
+          ))}
+        </div>
+      </>)}
+
+      {iStep===2&&(<>
+        <h2 className="h-screen">A little context</h2>
+        <p className="screen-sub">Optional — helps your clinician personalise safely.</p>
+        <div className="field"><label className="field-label">Already diagnosed with PCOS?</label>
+          <div className="seg-row">{["Yes","Not sure","No"].map(v=><button key={v} className={"sev-btn"+(intake.diagnosed===v?" on":"")} onClick={()=>set({diagnosed:v})}>{v}</button>)}</div>
+        </div>
+        <div className="field"><label className="field-label">Any related conditions?</label>
+          <div className="chip-wrap">{CONDITIONS_LIST.map(c=><button key={c} className={"chip"+(intake.conditions.includes(c)?" on":"")} onClick={()=>toggleCond(c)}>{c}</button>)}</div>
+        </div>
+        <div className="field"><label className="field-label">Anything else your clinician should know?</label>
+          <textarea className="textarea" rows={2} placeholder="Read by a human — not used to generate your plan." value={intake.note} onChange={e=>set({note:e.target.value})}/></div>
+      </>)}
+
+      {iStep===3&&(<>
+        <h2 className="h-screen">Ready to build your plan</h2>
+        <p className="screen-sub">Here's what we'll use:</p>
+        <div className="review-card">
+          <div className="review-row"><span className="review-key">Symptoms</span><span className="review-val">{Object.keys(intake.symptoms).map(k=>SYMPTOMS_LIST.find(s=>s.key===k)?.label).filter(Boolean).join(", ")||"—"}</span></div>
+          <div className="review-row"><span className="review-key">Primary goal</span><span className="review-val">{GOALS_LIST.find(g=>g.key===intake.primaryGoal)?.label||"—"}</span></div>
+          <div className="review-row"><span className="review-key">Diagnosed</span><span className="review-val">{intake.diagnosed||"—"}</span></div>
+          <div className="review-row"><span className="review-key">Conditions</span><span className="review-val">{intake.conditions.join(", ")||"—"}</span></div>
+        </div>
+        <div className="consent-note mt-8">A clinician will review your plan before you see it. Every recommendation shows its evidence.</div>
+      </>)}
+
+      <div className="intake-nav">
+        {iStep>0?<button className="btn btn-ghost" onClick={()=>setIStep(iStep-1)}>Back</button>:<span/>}
+        {iStep<STEPS.length-1
+          ?<button className="btn btn-primary" disabled={!canNext} onClick={()=>setIStep(iStep+1)}>Next <Ic n="arrow-right" size={14} cls="btn-arrow"/></button>
+          :<button className="btn btn-primary" onClick={onSubmit}>Build my plan <Ic n="sparkles" size={14} cls="btn-arrow"/></button>}
+      </div>
+    </div>
+  );
+}
+
+/* DRAFTING — US-1.C2 */
+function Drafting({ seq }) {
+  const [line, setLine] = useState(0);
+  useEffect(()=>{ const t1=setTimeout(()=>setLine(1),800),t2=setTimeout(()=>setLine(2),1700); return()=>{clearTimeout(t1);clearTimeout(t2);}; },[]);
+  return (
+    <div className="screen screen-center">
+      <div className="orbit-ring"><div className="orbit-core"><Ic n="sparkles" size={22}/></div></div>
+      <h2 className="h-screen tc">Building your plan</h2>
+      <div className="draft-lines">
+        {seq.map((s,i)=>(
+          <div key={i} className={"draft-line"+(i<=line?" on":"")}>
+            <span className="draft-ic">{i<line?<Ic n="check" size={13}/>:<span className={"spin-dot"+(i===line?" active":"")}/>}</span>{s}
+          </div>
+        ))}
+      </div>
+      <p className="muted tc tiny">Rules engine selecting from the evidence library — not free-text generation.</p>
+    </div>
+  );
+}
+
+/* PENDING — US-1.C3 member side */
+function Pending({ escalation }) {
+  return (
+    <div className="screen screen-center">
+      <div className="pend-mark"><Ic n="stethoscope" size={22}/></div>
+      <h2 className="h-screen tc">With your clinician</h2>
+      <p className="muted tc">Dr. Rao is reviewing your plan — usually within 24 hours. You'll be notified the moment it's ready.</p>
+      {escalation&&<div className="escalation-note"><Ic n="brain" size={15}/>You mentioned feeling quite low. A care companion will check in with you — you don't need to wait for the plan.</div>}
+      <div className="sla-badge"><Ic n="clock" size={12}/>Typical review · under 24h</div>
+    </div>
+  );
+}
+
+/* PLAN VIEW — US-2.C1 + US-2.C2 */
+function PlanView({ plan, checkins, completedActions, setCompletedActions, openEvidence, setOpenEvidence, onCheckin, onProgress, milestone, setMilestone, replanPending }) {
+  if (!plan) return null;
+  const mods = plan.modules;
+  const thisWeek = mods.find(m=>m.thisWeek)||mods[0];
+  const weekAction = plan.week1Actions?.find(a=>a.primary);
+  const toggleDone = id => setCompletedActions(s=>({...s,[id]:!s[id]}));
+  const toggleEv = id => setOpenEvidence(s=>({...s,[id]:!s[id]}));
+  const doneCount = plan.week1Actions?.filter(a=>completedActions[a.id]).length||0;
+  const totalActions = plan.week1Actions?.length||0;
+  const pct = totalActions?Math.round(doneCount/totalActions*100):0;
+
+  return (
+    <div className="screen screen-plan">
+      {milestone&&<div className="milestone-banner"><Ic n="sparkles" size={14}/>{milestone}<button className="milestone-close" onClick={()=>setMilestone(null)}><Ic n="x" size={12}/></button></div>}
+      {replanPending&&<div className="replan-banner"><Ic n="trending" size={14}/>A plan update is ready for clinician review.</div>}
+
+      <div className="plan-header">
+        <div><div className="eyebrow">90-day PCOS plan</div><h2 className="h-plan">Week {checkins.length+1} of 12</h2></div>
+        <ProgressRing pct={pct} size={52}/>
+      </div>
+
+      {/* This Week — US-2.C1 */}
+      <div className="this-week-card">
+        <div className="tw-eyebrow">This week · primary action</div>
+        <div className="tw-title">{thisWeek?.title}</div>
+        <div className="tw-action">{thisWeek?.action}</div>
+        <EvidenceToggle m={thisWeek} open={openEvidence} toggle={toggleEv} light/>
+        <div className="tw-actions-row">
+          {plan.week1Actions?.map(a=>(
+            <button key={a.id} className={"task-chip"+(completedActions[a.id]?" done":"")} onClick={()=>toggleDone(a.id)}>
+              {completedActions[a.id]?<Ic n="check" size={12}/>:<span className="task-dot"/>}
+              {MODULE_LIBRARY.find(m=>m.id===a.moduleId)?.title?.split(" ").slice(0,3).join(" ")}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Phase breakdown */}
+      {[1,2].map(p=>{
+        const rows=mods.filter(m=>m.phase===p&&m.id!==thisWeek?.id);
+        if(!rows.length) return null;
+        return (
+          <div key={p} className="phase-block">
+            <div className="phase-label">{PHASE_LABELS[p]}</div>
+            {rows.map((m,ri)=>(
+              <div key={m.id} className={"rec-card"+(m.kind==="referral"?" referral":"")+(m.kind==="safety"?" safety":"")} style={{animationDelay:(ri*60)+"ms"}}>
+                <div className="rec-head">
+                  <span className="rec-icon"><Ic n={m.icon} size={14}/></span>
+                  <span className="rec-title">{m.title}</span>
+                  <span className="cadence-pill">{m.cadence}</span>
+                </div>
+                <div className="rec-body">{m.action}</div>
+                <EvidenceToggle m={m} open={openEvidence} toggle={toggleEv}/>
+              </div>
+            ))}
+          </div>
+        );
+      })}
+
+      <div className="plan-foot">
+        <button className="btn btn-ghost btn-sm" onClick={onProgress}><Ic n="trending" size={14}/>My progress</button>
+        <button className="btn btn-primary btn-sm" onClick={onCheckin}><Ic n="calendar" size={14}/>Weekly check-in</button>
+      </div>
+    </div>
+  );
+}
+
+/* EVIDENCE TOGGLE — the trust spine (US-1.C2 + Evidence contract) */
+function EvidenceToggle({ m, open, toggle, light }) {
+  if (!m?.evidence) return null;
+  const isOpen = !!open[m.id];
+  const lvl = m.evidence.level;
+  return (
+    <div className={"ev-wrap"+(light?" light":"")}>
+      <button className="ev-btn" onClick={()=>toggle(m.id)} aria-expanded={isOpen}>
+        Why this? <Ic n="chevron-down" size={13} cls={"ev-chev"+(isOpen?" open":"")}/>
+      </button>
+      {isOpen&&(
+        <div className="ev-panel">
+          <div className="ev-meta"><span className={"ev-badge ev-"+lvl}>{EV_LEVELS[lvl]}</span><span className="ev-src">{m.evidence.source}</span></div>
+          <p className="ev-rationale">{m.evidence.rationale}</p>
+          <div className="ev-reviewer"><Ic n="shield" size={11}/>Reviewed by {m.evidence.reviewed_by}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* PROGRESS RING — US-3.C2 signature element */
+function ProgressRing({ pct, size=64 }) {
+  const r = (size-8)/2, circ = 2*Math.PI*r, dash = circ*(pct/100);
+  return (
+    <svg width={size} height={size} className="progress-ring">
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--teal-soft)" strokeWidth="5"/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--teal)" strokeWidth="5"
+        strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`} style={{transition:"stroke-dasharray .6s ease"}}/>
+      <text x={size/2} y={size/2+5} textAnchor="middle" className="ring-label">{pct}%</text>
+    </svg>
+  );
+}
+
+/* CHECKIN — US-3.C1 */
+function CheckinView({ checkins, onSubmit, onBack }) {
+  const [data, setData] = useState({ cycleLogged:null, symptomSev:{}, medsT:false, lifestyle:[], mood:null, moodTwo:null });
+  const set = p=>setData(s=>({...s,...p}));
+  const toggleLS = v => setData(s=>({ ...s, lifestyle: s.lifestyle.includes(v)?s.lifestyle.filter(x=>x!==v):[...s.lifestyle,v] }));
+  const week = checkins.length+1;
+  const canSubmit = data.mood!==null;
+  return (
+    <div className="screen">
+      <button className="back-btn" onClick={onBack}><Ic n="chevron-right" size={14} cls="back-ic"/>Back to plan</button>
+      <div className="eyebrow">Week {week} check-in</div>
+      <h2 className="h-screen">How was this week?</h2>
+      <p className="screen-sub">Under 60 seconds. Your plan adapts from this.</p>
+
+      <div className="ci-section">
+        <div className="ci-label">Did your period start this week?</div>
+        <div className="seg-row">
+          {["Yes","No","Not sure"].map(v=><button key={v} className={"sev-btn"+(data.cycleLogged===v?" on":"")} onClick={()=>set({cycleLogged:v})}>{v}</button>)}
+        </div>
+      </div>
+      <div className="ci-section">
+        <div className="ci-label">Top symptom severity</div>
+        <div className="seg-row">{SEV.map(v=><button key={v} className={"sev-btn"+(data.symptomSev.top===v?" on":"")} onClick={()=>set({symptomSev:{top:v}})}>{v}</button>)}</div>
+      </div>
+      <div className="ci-section">
+        <div className="ci-label">Took medications as planned?</div>
+        <div className="seg-row">{["Yes","No"].map(v=><button key={v} className={"sev-btn"+(String(data.medsT)===(v==="Yes"?"true":"false")?" on":"")} onClick={()=>set({medsT:v==="Yes"})}>{v}</button>)}</div>
+      </div>
+      <div className="ci-section">
+        <div className="ci-label">Lifestyle this week (pick all)</div>
+        <div className="chip-wrap">{["Moved daily","Slept well","Ate balanced","Managed stress"].map(v=><button key={v} className={"chip"+(data.lifestyle.includes(v)?" on":"")} onClick={()=>toggleLS(v)}>{v}</button>)}</div>
+      </div>
+      <div className="ci-section">
+        <div className="ci-label">Overall mood <span className="ci-req">required</span></div>
+        <div className="mood-row">
+          {[{v:"Good",e:"😊"},{v:"Okay",e:"😐"},{v:"Low",e:"😔"},{v:"Marked",e:"😞"}].map(({v,e})=>(
+            <button key={v} className={"mood-btn"+(data.mood===v?" on":"")} onClick={()=>set({mood:v})}>{e}<span>{v}</span></button>
+          ))}
+        </div>
+      </div>
+      <div className="ci-section">
+        <div className="ci-label">Anxiety level this week</div>
+        <div className="seg-row">{["None","Mild","Moderate","High"].map(v=><button key={v} className={"sev-btn"+(data.moodTwo===v?" on":"")} onClick={()=>set({moodTwo:v})}>{v}</button>)}</div>
+      </div>
+
+      <div className="intake-nav">
+        <button className="btn btn-ghost" onClick={onBack}>Cancel</button>
+        <button className="btn btn-primary" disabled={!canSubmit} onClick={()=>onSubmit(data)}>Save check-in <Ic n="check" size={14} cls="btn-arrow"/></button>
+      </div>
+    </div>
+  );
+}
+
+/* PROGRESS — US-3.C2 */
+function ProgressView({ checkins, plan, onBack }) {
+  const total = checkins.length;
+  const moodMap = { Good:4, Okay:3, Low:2, Marked:1 };
+  const moodScores = checkins.map((c,i)=>({ week:i+1, score:moodMap[c.mood]||2 }));
+  const symScores = checkins.map((c,i)=>({ week:i+1, score:c.symptomSev?.top==="Mild"?3:c.symptomSev?.top==="Moderate"?2:c.symptomSev?.top==="Marked"?1:2 }));
+  const adherence = checkins.length>0?Math.round((checkins.filter(c=>c.medsT).length/checkins.length)*100):0;
+  return (
+    <div className="screen screen-progress">
+      <button className="back-btn" onClick={onBack}><Ic n="chevron-right" size={14} cls="back-ic"/>Back to plan</button>
+      <div className="eyebrow">Your progress</div>
+      <h2 className="h-screen">{total} week{total!==1?"s":""} in</h2>
+      {total===0&&<div className="empty-state"><Ic n="trending" size={28}/><p>Complete your first check-in to start tracking progress.</p></div>}
+      {total>0&&(<>
+        <div className="metric-row">
+          <MetricCard label="Check-ins done" value={total} unit="weeks" color="teal"/>
+          <MetricCard label="Med adherence" value={adherence} unit="%" color="teal"/>
+          <MetricCard label="Goal" value={GOALS_LIST.find(g=>g.key===plan?.primaryGoal)?.label||"—"} unit="" color="clay"/>
+        </div>
+        <div className="chart-block">
+          <div className="chart-label">Mood trend (1=low, 4=good)</div>
+          <MiniChart data={moodScores} color="var(--teal)" max={4}/>
+        </div>
+        <div className="chart-block">
+          <div className="chart-label">Symptom severity (1=marked, 3=mild)</div>
+          <MiniChart data={symScores} color="var(--clay)" max={3}/>
+        </div>
+        <div className="north-star-card">
+          <div className="ns-label">North star progress</div>
+          <div className="ns-val">{total>=2?Math.round((moodScores.filter(m=>m.score>=3).length/total)*100):0}%</div>
+          <div className="ns-desc">weeks with positive mood trend · target ≥ 40% at 90 days</div>
+        </div>
+      </>)}
+    </div>
+  );
+}
+
+function MetricCard({ label, value, unit, color }) {
+  return <div className={"metric-card metric-"+color}><div className="metric-val">{value}<span className="metric-unit">{unit}</span></div><div className="metric-label">{label}</div></div>;
+}
+
+function MiniChart({ data, color, max }) {
+  if (!data.length) return null;
+  const W=220, H=60, pad=6;
+  const xStep = data.length>1?(W-pad*2)/(data.length-1):0;
+  const yScale = v => H-pad - (v/max)*(H-pad*2);
+  const pts = data.map((d,i)=>({ x:pad+i*xStep, y:yScale(d.score) }));
+  const path = pts.map((p,i)=>(i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`)).join(" ");
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="mini-chart">
+      <polyline points={pts.map(p=>`${p.x},${p.y}`).join(" ")} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {pts.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r="3.5" fill={color}/>)}
+      {data.map((d,i)=><text key={i} x={pad+i*xStep} y={H} textAnchor="middle" className="chart-label-sm">W{d.week}</text>)}
+    </svg>
+  );
+}
+
+/* NUDGE PANEL — US-2.C3 */
+function NudgePanel({ notifications, step, checkins }) {
+  if (step==="welcome"||step==="intake"||step==="drafting") return null;
+  const nudges = [
+    ...(checkins.length===0&&step==="plan"?[{ id:"n0", msg:"Complete your first check-in to start adapting your plan.", type:"tip" }]:[]),
+    ...notifications.slice(0,3),
+  ];
+  if (!nudges.length) return null;
+  return (
+    <div className="nudge-panel">
+      <div className="nudge-header"><Ic n="bell" size={14}/>Notifications</div>
+      {nudges.map(n=>(
+        <div key={n.id||n.msg} className={"nudge-item nudge-"+n.type}>
+          <Ic n={n.type==="alert"?"alert":n.type==="success"?"check":"info"} size={13}/>
+          <span>{n.msg}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════ CLINICIAN CONSOLE — US-6 ═══════════════════ */
+function ClinicianConsole({ plan, planStatus, onApprove, clinRemoved, setClinRemoved, clinApproved, setClinApproved, clinAck, setClinAck, slaStart, auditLog }) {
+  const [tab, setTab] = useState("review");
+  const elapsed = Math.round((Date.now()-slaStart)/60000);
+  const slaOk = elapsed<1440;
+  if (!plan||planStatus===PLAN_STATES.DRAFT) return (
+    <div className="console-empty"><Ic n="clipboard" size={30}/><h2>No plans in queue</h2><p>Complete the member intake first.</p></div>
+  );
+  const modules = plan.modules.filter(m=>!clinRemoved[m.id]);
+  const allAcked = !plan.escalation||clinAck;
+  const canApprove = allAcked&&planStatus===PLAN_STATES.PENDING;
+
+  return (
+    <div className="console">
+      <div className="console-head">
+        <div>
+          <div className="eyebrow">Clinician review queue</div>
+          <h2 className="console-title">Priya S. · PCOS draft · v{plan.version}</h2>
+          <div className="console-meta">
+            Goal: <b>{GOALS_LIST.find(g=>g.key===plan.primaryGoal)?.label||"—"}</b> · {modules.length} recommendations
+          </div>
+        </div>
+        <div className="console-right">
+          <span className={"status-pill "+(planStatus===PLAN_STATES.PUBLISHED?"pill-ok":"pill-wait")}>
+            {planStatus===PLAN_STATES.PUBLISHED?<><Ic n="check" size={12}/>Released</>:<><span className="pulse-dot"/>Awaiting review</>}
+          </span>
+          <div className={"sla-chip"+(slaOk?"":" sla-risk")}><Ic n="clock" size={11}/>{slaOk?`${elapsed}m / 24h`:"SLA at risk"}</div>
+        </div>
+      </div>
+
+      {plan.escalation&&(
+        <div className={"escalation-flag"+(clinAck?" acked":"")}>
+          <Ic n="alert" size={16}/>
+          <div className="flag-body"><b>Wellbeing flag</b> — Priya reported marked low mood. Guideline recommends screening and support before release.</div>
+          {!clinAck?<button className="btn btn-rose" onClick={()=>setClinAck(true)}>Acknowledge & route to coordinator</button>
+                    :<span className="flag-done"><Ic n="check" size={12}/>Routed to coordinator</span>}
+        </div>
+      )}
+
+      <div className="console-tabs">
+        {["review","audit"].map(t=><button key={t} className={"ctab"+(tab===t?" on":"")} onClick={()=>setTab(t)}>{t==="review"?"Plan review":"Audit log"}</button>)}
+      </div>
+
+      {tab==="review"&&(
+        <div className="review-list">
+          {plan.modules.map((m,i)=>{
+            const off=!!clinRemoved[m.id];
+            return (
+              <div key={m.id} className={"rrec"+(off?" off":"")} style={{animationDelay:(i*40)+"ms"}}>
+                <div className="rrec-icon"><Ic n={m.icon} size={14}/></div>
+                <div className="rrec-main">
+                  <div className="rrec-top">
+                    <span className="rrec-title">{m.title}</span>
+                    <span className={"ev-badge ev-"+m.evidence.level}>{EV_LEVELS[m.evidence.level]}</span>
+                  </div>
+                  <div className="rrec-action">{m.action}</div>
+                  <div className="rrec-ev"><span className="ev-src">{m.evidence.source}</span> · {m.evidence.rationale}</div>
+                </div>
+                {planStatus!==PLAN_STATES.PUBLISHED&&(
+                  <button className={"rrec-toggle"+(off?" restore":"")} onClick={()=>setClinRemoved(s=>({...s,[m.id]:!s[m.id]}))}>
+                    {off?"Restore":"Remove"}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {tab==="audit"&&(
+        <div className="audit-list">
+          {auditLog.length===0&&<div className="audit-empty">No transitions yet.</div>}
+          {auditLog.map((e,i)=>(
+            <div key={i} className="audit-row">
+              <span className="audit-ts">{new Date(e.ts).toLocaleTimeString()}</span>
+              <span className="audit-action">{e.action}</span>
+              <span className="audit-data">{JSON.stringify(e.data)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="console-foot">
+        {planStatus===PLAN_STATES.PUBLISHED
+          ?<div className="released-msg"><Ic n="check" size={14}/>Plan released to Priya — switch to Member to see it live.</div>
+          :<>
+            <button className="btn btn-ghost">Request changes</button>
+            <button className="btn btn-primary" disabled={!canApprove} onClick={onApprove}>Approve & release <Ic n="arrow-right" size={14} cls="btn-arrow"/></button>
+          </>}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════ COORDINATOR CONSOLE — US-5 ═══════════════════ */
+function CoordinatorConsole({ plan, planStatus, checkins, coordHandled, setCoordHandled, coordNote, setCoordNote, escalation, notifications }) {
+  const [activeTab, setActiveTab] = useState("queue");
+  if (!plan) return <div className="console-empty"><Ic n="users" size={30}/><h2>No members in queue</h2><p>Complete the member intake first.</p></div>;
+
+  // Full master list built independently of handled state
+  // open/handled are then split from allItems — fixes the empty-handled bug
+  const allItems = [
+    // Escalation flag — always visible if raised
+    ...(escalation ? [{ id:"escalation", priority:"high", label:"Wellbeing flag",
+        desc:"Priya reported marked low mood — clinician has routed for follow-up.", action:"Reach out" }] : []),
+    // First check-in slot — stays visible; switches label once done
+    ...(planStatus===PLAN_STATES.PUBLISHED ? [{
+        // id changes when checkin is done so pre-handled "due" never hides "received"
+        id: checkins.length===0 ? "first-checkin-due" : "first-checkin-done",
+        priority: checkins.length===0 ? "med" : "low",
+        label: checkins.length===0 ? "First check-in due" : "Week 1 check-in received",
+        desc:  checkins.length===0
+          ? "Priya has not completed her first check-in yet — consider a nudge."
+          : "Mood: "+(checkins[0].mood||"--")+" | Symptom: "+((checkins[0].symptomSev&&checkins[0].symptomSev.top)||"--")
+            +" | Lifestyle: "+((checkins[0].lifestyle||[]).join(", ")||"--"),
+        action: checkins.length===0 ? "Send nudge" : "Acknowledge"
+    }] : []),
+    // One queue item per subsequent check-in
+    ...checkins.slice(1).map((c,i)=>({
+        id:"checkin-w"+(i+2),
+        priority: c.mood==="Marked" ? "high" : c.mood==="Low" ? "med" : "low",
+        label:"Week "+(i+2)+" check-in received"+(c.mood==="Marked"||c.mood==="Low" ? " — low mood flagged" : ""),
+        desc:"Mood: "+(c.mood||"--")+" | Symptom: "+((c.symptomSev&&c.symptomSev.top)||"--")
+             +" | Lifestyle: "+((c.lifestyle||[]).join(", ")||"--"),
+        action: c.mood==="Marked"||c.mood==="Low" ? "Follow up" : "Acknowledge"
+    })),
+    // 4-week milestone
+    ...(checkins.length>=4 ? [{ id:"milestone-4", priority:"low",
+        label:"4-week milestone reached",
+        desc:"Priya has completed 4 check-ins. Consider sending a progress message.", action:"Send message" }] : []),
+    // Re-plan trigger (every 4 weeks)
+    ...(checkins.length>0&&checkins.length%4===0 ? [{ id:"replan-w"+checkins.length, priority:"med",
+        label:"Plan re-draft ready (Week "+checkins.length+")",
+        desc:"A plan delta is queued for clinician review.", action:"Notify clinician" }] : []),
+  ];
+  const open    = allItems.filter(i => !coordHandled[i.id]);
+  const handled = allItems.filter(i =>  coordHandled[i.id]);
+
+  return (
+    <div className="console">
+      <div className="console-head">
+        <div><div className="eyebrow">Care coordinator</div><h2 className="console-title">Maya's queue</h2><div className="console-meta">{open.length} open · {handled.length} handled · 1 member (Priya S.)</div></div>
+        <span className={"status-pill "+(open.length===0?"pill-ok":"pill-wait")}>{open.length===0?"All clear":`${open.length} needs attention`}</span>
+      </div>
+
+      <div className="console-tabs">
+        {["queue","timeline","message"].map(t=><button key={t} className={"ctab"+(activeTab===t?" on":"")} onClick={()=>setActiveTab(t)}>{t==="queue"?"Attention queue":t==="timeline"?"Member timeline":"Send message"}</button>)}
+      </div>
+
+      {activeTab==="queue"&&(
+        <div className="coord-queue">
+          {open.length===0&&<div className="queue-clear"><Ic n="check" size={22}/>All caught up — no open items.</div>}
+          {open.map(item=>(
+            <div key={item.id} className={"queue-item priority-"+item.priority}>
+              <div className="qi-left">
+                <span className={"qi-dot dot-"+item.priority}/>
+                <div><div className="qi-label">{item.label}</div><div className="qi-desc">{item.desc}</div></div>
+              </div>
+              <button className="btn btn-sm btn-primary" onClick={()=>setCoordHandled(s=>({...s,[item.id]:true}))}>{item.action}</button>
+            </div>
+          ))}
+          {handled.length>0&&<div className="handled-section"><div className="phase-label">Handled</div>{handled.map(item=><div key={item.id} className="queue-item handled"><Ic n="check" size={13}/><span>{item.label} — done</span></div>)}</div>}
+        </div>
+      )}
+
+      {activeTab==="timeline"&&(
+        <div className="timeline">
+          <div className="tl-member"><Ic n="user" size={14}/><b>Priya S.</b> · PCOS · {GOALS_LIST.find(g=>g.key===plan.primaryGoal)?.label||"—"}</div>
+          <div className="tl-event tl-plan"><span className="tl-dot"/><div><b>Plan published</b> — {plan.modules.length} recommendations · v{plan.version}</div></div>
+          {checkins.map((c,i)=>(
+            <div key={i} className="tl-event tl-checkin">
+              <span className="tl-dot"/>
+              <div><b>Week {i+1} check-in</b> — Mood: {c.mood||"—"} · Symptom: {c.symptomSev?.top||"—"} · Lifestyle: {(c.lifestyle||[]).join(", ")||"—"}</div>
+            </div>
+          ))}
+          {checkins.length===0&&<div className="tl-empty">No check-ins yet.</div>}
+          {escalation&&<div className="tl-event tl-flag"><span className="tl-dot"/><div><b>Wellbeing flag</b> — marked low mood at intake</div></div>}
+        </div>
+      )}
+
+      {activeTab==="message"&&(
+        <div className="msg-panel">
+          <div className="msg-to"><Ic n="user" size={13}/> To: Priya S.</div>
+          <textarea className="textarea" rows={4} placeholder="Write a message to Priya — this will appear as a care companion note." value={coordNote} onChange={e=>setCoordNote(e.target.value)}/>
+          <button className="btn btn-primary" disabled={!coordNote.trim()} onClick={()=>{ setCoordNote(""); }}>
+            Send message <Ic n="send" size={14} cls="btn-arrow"/>
+          </button>
+          <div className="msg-note">Messages are private between care companion and member. Not visible to employers.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══ SMALL SHARED COMPONENTS ═══ */
+function StepDots({ n, i, labels }) {
+  return (
+    <div className="step-dots">
+      {Array.from({length:n}).map((_,k)=>(
+        <div key={k} className={"step-dot-wrap"+(k===i?" on":k<i?" done":"")}>
+          <span className="step-dot"/>
+          <span className="step-label">{labels[k]}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+
+
+
+
+</script>
+</body>
+</html>
